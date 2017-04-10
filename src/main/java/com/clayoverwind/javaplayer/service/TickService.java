@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public enum TickService {
     INSTANCE;
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private AtomicBoolean isTicking = new AtomicBoolean(false);
 
     public void start() {
@@ -27,13 +27,6 @@ public enum TickService {
                     Application.INSTANCE.post(TickEvent.INSTANCE);
                 }
             }, 0, 1000, TimeUnit.MILLISECONDS);
-
-            executorService.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    Application.INSTANCE.post(FrameTickEvent.INSTANCE);
-                }
-            }, 0, 40, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -42,6 +35,4 @@ public enum TickService {
             executorService.shutdown();
         }
     }
-
-
 }

@@ -1,5 +1,6 @@
 package com.clayoverwind.javaplayer;
 
+import com.clayoverwind.javaplayer.presenter.DanMuWindowPresenter;
 import com.clayoverwind.javaplayer.presenter.MainWindowPresenter;
 import com.google.common.eventbus.EventBus;
 

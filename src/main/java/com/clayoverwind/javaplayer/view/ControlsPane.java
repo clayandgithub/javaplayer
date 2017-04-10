@@ -24,10 +24,13 @@ import com.clayoverwind.javaplayer.action.MediaPlayerActions;
 import com.clayoverwind.javaplayer.event.*;
 import com.clayoverwind.javaplayer.iview.ITimeSlider;
 import com.clayoverwind.javaplayer.iview.IVideoContentPane;
+import com.clayoverwind.javaplayer.presenter.TimeSliderPresenter;
 import com.google.common.eventbus.Subscribe;
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -77,7 +80,7 @@ final class ControlsPane extends BasePanel {
 
     public ControlsPane(IVideoContentPane videoContentPane) {
         MediaPlayerActions mediaPlayerActions = videoContentPane.getMediaPlayerActions();
-        EmbeddedMediaPlayerComponent mediaPlayerComponent = videoContentPane.getMediaPlayerComponent();
+        EmbeddedMediaPlayer mediaPlayer = videoContentPane.getMediaPlayer();
         playPauseButton = new BigButton();
         playPauseButton.setAction(mediaPlayerActions.playbackPlayAction());
         previousButton = new StandardButton();
@@ -102,7 +105,8 @@ final class ControlsPane extends BasePanel {
 
         add(playPauseButton);
 
-        timeSlider = new TimeSlider(videoContentPane, videoContentPane);
+        timeSlider = TimeSliderPresenter.INSTANCE.createTimeSlider(videoContentPane);
+        timeSlider.addTimeSliderListener(videoContentPane);
         videoContentPane.setTimeSlider(timeSlider);
         add(timeSlider.getComponent(), "growx");
 
@@ -120,7 +124,7 @@ final class ControlsPane extends BasePanel {
         volumeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                mediaPlayerComponent.getMediaPlayer().setVolume(volumeSlider.getValue());
+                mediaPlayer.setVolume(volumeSlider.getValue());
             }
         });
 
@@ -129,14 +133,14 @@ final class ControlsPane extends BasePanel {
         muteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediaPlayerComponent.getMediaPlayer().mute();
+                mediaPlayer.mute();
             }
         });
 
         fullscreenButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediaPlayerComponent.getMediaPlayer().toggleFullScreen();
+                mediaPlayer.toggleFullScreen();
             }
         });
 

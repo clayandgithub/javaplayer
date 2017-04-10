@@ -1,6 +1,7 @@
 package com.clayoverwind.javaplayer.iview;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author clayoverwind
@@ -10,5 +11,11 @@ import javax.swing.*;
 public interface IMainWindow {
     void playMedia(String path);
 
-    void playDanMu(String path);
+    Component getComponent();
+
+    JFrame getWindow();
+
+    void setSubTitleFile(String filePath);
+
+    Component getVideoContentPane();
 }

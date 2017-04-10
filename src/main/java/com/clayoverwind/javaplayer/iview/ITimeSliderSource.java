@@ -7,4 +7,8 @@ package com.clayoverwind.javaplayer.iview;
  */
 public interface ITimeSliderSource {
     float getPosition();
+
+    long getTime();
+
+    long getDuration();
 }

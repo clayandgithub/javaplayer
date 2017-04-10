@@ -17,4 +17,6 @@ public interface ITimeSlider {
     void setDuration(long duration);
 
     Component getComponent();
+
+    void addTimeSliderListener(ITimeSliderListener listener);
 }

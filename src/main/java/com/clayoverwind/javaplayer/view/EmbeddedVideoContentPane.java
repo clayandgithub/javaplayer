@@ -4,6 +4,7 @@ import com.clayoverwind.javaplayer.Application;
 import com.clayoverwind.javaplayer.action.MediaPlayerActions;
 import com.clayoverwind.javaplayer.event.*;
 import com.clayoverwind.javaplayer.iview.IDanMuPanel;
+import com.clayoverwind.javaplayer.iview.IDanMuWindow;
 import com.clayoverwind.javaplayer.iview.ITimeSlider;
 import com.clayoverwind.javaplayer.iview.IVideoContentPane;
 import com.clayoverwind.javaplayer.presenter.DanMuPlayer;
@@ -15,11 +16,12 @@ import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
 
-public final class VideoContentPane extends BasePanel implements IVideoContentPane {
+public final class EmbeddedVideoContentPane extends BasePanel implements IVideoContentPane {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -35,8 +37,13 @@ public final class VideoContentPane extends BasePanel implements IVideoContentPa
 
     private ITimeSlider timeSlider;
 
-    public VideoContentPane(Window parentWindow) {
+    private IDanMuWindow danMuWindow;
 
+    private long time;
+
+    private long duration;
+
+    public EmbeddedVideoContentPane(Window parentWindow) {
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent(){
             @Override
             protected String[] onGetMediaPlayerFactoryExtraArgs() {
@@ -121,6 +128,7 @@ public final class VideoContentPane extends BasePanel implements IVideoContentPa
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        duration = newDuration;
                         if (timeSlider != null) {
                             timeSlider.setDuration(newDuration);
                         }
@@ -135,8 +143,12 @@ public final class VideoContentPane extends BasePanel implements IVideoContentPa
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        time = newTime;
                         if (timeSlider != null) {
                             timeSlider.setTime(newTime);
+                        }
+                        if (danMuWindow != null) {
+                            danMuWindow.setTime(newTime);
                         }
 //                        statusBar.setTime(newTime);
                     }
@@ -162,6 +174,11 @@ public final class VideoContentPane extends BasePanel implements IVideoContentPa
     @Override
     public void setTimeSlider(ITimeSlider timeSlider) {
         this.timeSlider = timeSlider;
+    }
+
+    @Override
+    public void setDanMuWindow(IDanMuWindow danMuWindow) {
+        this.danMuWindow = danMuWindow;
     }
 
     @Override
@@ -205,14 +222,39 @@ public final class VideoContentPane extends BasePanel implements IVideoContentPa
         mediaPlayerComponent.getMediaPlayer().setSubTitleFile(path);
     }
 
+//    @Subscribe
+//    public void onTick(TickEvent event) {
+//        System.out.println("-----------------onTick-------------");
+////        danMuWindow.repaint();
+//    }
+
     @Override
     public MediaPlayerActions getMediaPlayerActions() {
         return mediaPlayerActions;
     }
 
     @Override
-    public EmbeddedMediaPlayerComponent getMediaPlayerComponent() {
-        return mediaPlayerComponent;
+    public EmbeddedMediaPlayer getMediaPlayer() {
+        return mediaPlayerComponent.getMediaPlayer();
+    }
+
+    @Override
+    public long getTime() {
+        return time;
+    }
+
+    @Override
+    public long getDuration() {
+        return duration;
+    }
+
+    @Override
+    public void setTime(long time) {
+        getMediaPlayer().setTime(time);
+    }
+
+    @Override
+    public void setDuration(long duration) {
     }
 
     @Override

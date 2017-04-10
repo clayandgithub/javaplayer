@@ -19,4 +19,6 @@ public class ApplicationTest {
         Collections.sort(list, (Integer a, Integer b) ->{return a.compareTo(b);});
         System.out.println(list);
     }
+
+
 }

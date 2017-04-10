@@ -1,5 +1,7 @@
 package com.clayoverwind.javaplayer.view;
 
+import com.clayoverwind.javaplayer.iview.IMainWindow;
+import com.clayoverwind.javaplayer.presenter.DanMuWindowPresenter;
 import com.clayoverwind.javaplayer.util.JarToolUtil;
 
 import javax.swing.*;
@@ -14,9 +16,9 @@ import java.io.File;
  * @E-mail clayanddev@163.com
  */
 public class MenuBar extends JMenuBar {
-    private MainWindow parentWindow;
+    private IMainWindow parentWindow;
 
-    public MenuBar(MainWindow parentWindow) {
+    public MenuBar(IMainWindow parentWindow) {
         super();
         this.parentWindow = parentWindow;
         addFileMenu();
@@ -50,11 +52,21 @@ public class MenuBar extends JMenuBar {
             }
         });
 
+        JMenuItem item4 = new JMenuItem("显示/隐藏弹幕");
+        item4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showOrHideDanMu();
+            }
+        });
+
         menu.add(item1);
         menu.addSeparator();
         menu.add(item2);
         menu.addSeparator();
         menu.add(item3);
+        menu.addSeparator();
+        menu.add(item4);
     }
 
     private void addHelpMenu() {
@@ -92,40 +104,48 @@ public class MenuBar extends JMenuBar {
     }
 
     private void showIntroductionDialog() {
-        JOptionPane.showMessageDialog(parentWindow, "详见https://github.com/clayandgithub/javaplayer", "软件说明", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(parentWindow.getComponent(), "详见https://github.com/clayandgithub/javaplayer", "软件说明", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void showCodeAddressDialog() {
-        JOptionPane.showMessageDialog(parentWindow, "https://github.com/clayandgithub/javaplayer", "项目地址", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(parentWindow.getComponent(), "https://github.com/clayandgithub/javaplayer", "项目地址", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showAuthorDialog() {
-        JOptionPane.showMessageDialog(parentWindow, "详见http://clayandgithub.github.io/", "关于作者", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(parentWindow.getComponent(), "详见http://clayandgithub.github.io/", "关于作者", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void importMedia() {
-        String filePath = chooseFileToImport("请选择视频文件:");
+        String filePath = chooseFileToImport("请选择视频文件:", parentWindow.getComponent());
         if (filePath != null) {
             parentWindow.playMedia(filePath);
         }
     }
 
     private void importSubtitle() {
-        String filePath = chooseFileToImport("请选择字幕文件:");
+        String filePath = chooseFileToImport("请选择字幕文件:", parentWindow.getComponent());
         if (filePath != null) {
             parentWindow.setSubTitleFile(filePath);
         }
     }
 
     private void importDanmu() {
-        JOptionPane.showMessageDialog(parentWindow, "暂不支持", "抱歉", JOptionPane.INFORMATION_MESSAGE);
+//        JOptionPane.showMessageDialog(parentWindow.getComponent(), "暂不支持", "抱歉", JOptionPane.INFORMATION_MESSAGE);
+        DanMuWindowPresenter.INSTANCE.showDanMuWindow();
+        DanMuWindowPresenter.INSTANCE.attachOverlayComponentAndFocusWindow(parentWindow.getWindow(), parentWindow.getVideoContentPane());
+        DanMuWindowPresenter.INSTANCE.importDanMuFile();
     }
 
-    public String chooseFileToImport(String dialogTitle) {
+    private void showOrHideDanMu() {
+//        JOptionPane.showMessageDialog(parentWindow.getComponent(), "暂不支持", "抱歉", JOptionPane.INFORMATION_MESSAGE);
+        DanMuWindowPresenter.INSTANCE.showOrHideDanMu();
+    }
+
+    public String chooseFileToImport(String dialogTitle, Component parent) {
         JFileChooser jfc = new JFileChooser(JarToolUtil.getJarFilePath());
         jfc.setDialogTitle(dialogTitle);
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        int result = jfc.showOpenDialog(parentWindow);
+        int result = jfc.showOpenDialog(parent);
         if(JFileChooser.APPROVE_OPTION == result) {
             File file = jfc.getSelectedFile();
             return file.getAbsolutePath();

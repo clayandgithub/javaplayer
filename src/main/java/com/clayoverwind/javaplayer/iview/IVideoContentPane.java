@@ -2,9 +2,11 @@ package com.clayoverwind.javaplayer.iview;
 
 import com.clayoverwind.javaplayer.action.MediaPlayerActions;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * @author clayoverwind
@@ -20,11 +22,13 @@ public interface IVideoContentPane extends ITimeSliderSource, ITimeSliderListene
 
     MediaPlayerActions getMediaPlayerActions();
 
-    EmbeddedMediaPlayerComponent getMediaPlayerComponent();
+    EmbeddedMediaPlayer getMediaPlayer();
 
     void playMedia(String path);
 
     void setTimeSlider(ITimeSlider timeSlider);
+
+    void setDanMuWindow(IDanMuWindow danMuWindow);
 
     void setSubTitleFile(String subTitleFile);
 }

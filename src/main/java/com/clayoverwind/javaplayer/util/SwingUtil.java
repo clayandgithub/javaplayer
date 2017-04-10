@@ -23,7 +23,7 @@ public class SwingUtil {
         return new Size((int) font.getStringBounds(str, sFontRenderContext).getWidth(), (int) font.getStringBounds(str, sFontRenderContext).getHeight());
     }
 
-    public static void layoutAtScreenCenter(JFrame window) {
+    public static void layoutAtScreenCenter(Component window) {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
         int x = (screenSize.width - window.getWidth()) / 2;

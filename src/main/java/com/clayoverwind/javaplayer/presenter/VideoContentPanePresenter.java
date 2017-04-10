@@ -1,10 +1,8 @@
 package com.clayoverwind.javaplayer.presenter;
 
-import com.clayoverwind.javaplayer.iview.IMainWindow;
+import com.clayoverwind.javaplayer.iview.IDanMuWindow;
 import com.clayoverwind.javaplayer.iview.IVideoContentPane;
-import com.clayoverwind.javaplayer.view.MainWindow;
-import com.clayoverwind.javaplayer.view.VideoContentPane;
-import com.sun.jna.platform.unix.X11;
+import com.clayoverwind.javaplayer.view.EmbeddedVideoContentPane;
 
 import java.awt.*;
 
@@ -20,13 +18,18 @@ public enum VideoContentPanePresenter {
 
     public IVideoContentPane createVideoContentPane(Window parentWindow) {
         if (videoContentPane == null) {
-            videoContentPane = new VideoContentPane(parentWindow);
+            videoContentPane = new EmbeddedVideoContentPane(parentWindow);
+//            videoContentPane = new DirectVideoContentPane(parentComponent);
         }
         return videoContentPane;
     }
 
     public IVideoContentPane getVideoContentPane() {
         return videoContentPane;
+    }
+
+    public void setDanMuWindow(IDanMuWindow danMuWindow) {
+        this.videoContentPane.setDanMuWindow(danMuWindow);
     }
 
 }

@@ -27,15 +27,17 @@ import com.clayoverwind.javaplayer.iview.ITimeSliderSource;
 import com.clayoverwind.javaplayer.util.TimeUtil;
 import com.google.common.eventbus.Subscribe;
 import net.miginfocom.swing.MigLayout;
-import uk.co.caprica.vlcj.player.MediaPlayer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-final class TimeSlider extends JPanel implements ITimeSlider {
+final public class TimeSlider extends JPanel implements ITimeSlider {
 
     private final JSlider slider;
     private final JLabel timeLabel;
@@ -43,17 +45,19 @@ final class TimeSlider extends JPanel implements ITimeSlider {
 
     private long time;
 
+    private long duration;
+
     private final ITimeSliderSource timeSliderSource;
 
-    private final ITimeSliderListener timeSliderListener;
+    private final LinkedList<ITimeSliderListener> timeSliderListeners;
 
     private final AtomicBoolean sliderChanging = new AtomicBoolean();
 
     private final AtomicBoolean positionChanging = new AtomicBoolean();
 
-    TimeSlider(ITimeSliderSource source, ITimeSliderListener listener) {
+    public TimeSlider(ITimeSliderSource source) {
         this.timeSliderSource = source;
-        this.timeSliderListener = listener;
+        this.timeSliderListeners = new LinkedList<>();
 
         timeLabel = new StandardLabel("9:99:99");
 
@@ -73,10 +77,19 @@ final class TimeSlider extends JPanel implements ITimeSlider {
                     } else {
                         sliderChanging.set(false);
                     }
-                    timeSliderListener.setPosition(source.getValue() / 1000.0f);
+                    for (ITimeSliderListener listener : timeSliderListeners) {
+//                        listener.setTime((long)(duration * (source.getValue() / 1000.0f)));
+                        listener.setPosition(source.getValue() / 1000.0f);
+                    }
                 }
             }
         });
+        slider.addMouseListener(
+            new MouseAdapter() {
+                public void mousePressed(MouseEvent event) {
+                    slider.setValue((int)(event.getX() * 1000.0f / slider.getWidth()));
+                }
+            });
 
         durationLabel = new StandardLabel("9:99:99");
 
@@ -95,11 +108,17 @@ final class TimeSlider extends JPanel implements ITimeSlider {
     }
 
     @Override
+    public void addTimeSliderListener(ITimeSliderListener listener) {
+        timeSliderListeners.add(listener);
+    }
+
+    @Override
     public void refresh() {
         timeLabel.setText(TimeUtil.formatTime(time));
 
         if (!sliderChanging.get()) {
             int value = (int) (timeSliderSource.getPosition() * 1000.0f);
+//            int value = (int) (time * 1000.0f / duration);
             positionChanging.set(true);
             slider.setValue(value);
             positionChanging.set(false);
@@ -113,6 +132,7 @@ final class TimeSlider extends JPanel implements ITimeSlider {
 
     @Override
     public void setDuration(long duration) {
+        this.duration = duration;
         durationLabel.setText(TimeUtil.formatTime(duration));
     }
 

@@ -1,6 +1,6 @@
 package com.clayoverwind.javaplayer.presenter;
 
-import com.clayoverwind.javaplayer.view.MainWindow;
+import com.clayoverwind.javaplayer.iview.IMainWindow;
 import com.clayoverwind.javaplayer.view.MenuBar;
 
 /**
@@ -11,7 +11,7 @@ import com.clayoverwind.javaplayer.view.MenuBar;
 public enum MenuBarPresenter {
     INSTANCE;
 
-    public MenuBar createMenuBar(MainWindow mainWindow) {
+    public MenuBar createMenuBar(IMainWindow mainWindow) {
         return new MenuBar(mainWindow);
     }
 }

@@ -7,4 +7,8 @@ package com.clayoverwind.javaplayer.iview;
  */
 public interface ITimeSliderListener {
     void setPosition(float v);
+
+    void setTime(long time);
+
+    void setDuration(long duration);
 }

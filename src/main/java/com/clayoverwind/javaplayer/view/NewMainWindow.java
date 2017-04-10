@@ -3,15 +3,12 @@ package com.clayoverwind.javaplayer.view;
 import com.clayoverwind.javaplayer.Application;
 import com.clayoverwind.javaplayer.event.AfterExitFullScreenEvent;
 import com.clayoverwind.javaplayer.event.BeforeEnterFullScreenEvent;
-import com.clayoverwind.javaplayer.event.MainWindowEvent;
 import com.clayoverwind.javaplayer.event.ShutdownEvent;
 import com.clayoverwind.javaplayer.iview.IDanMuPanel;
 import com.clayoverwind.javaplayer.iview.IMainWindow;
-import com.clayoverwind.javaplayer.iview.ITimeSlider;
 import com.clayoverwind.javaplayer.iview.IVideoContentPane;
 import com.clayoverwind.javaplayer.presenter.MenuBarPresenter;
 import com.clayoverwind.javaplayer.presenter.VideoContentPanePresenter;
-import com.clayoverwind.javaplayer.util.SwingUtil;
 import com.google.common.eventbus.Subscribe;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
@@ -21,7 +18,9 @@ import uk.co.caprica.vlcj.runtime.streams.NativeStreams;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * @author clayoverwind
@@ -29,7 +28,8 @@ import java.awt.event.*;
  * @E-mail clayanddev@163.com
  */
 
-public class MainWindow extends JFrame implements IMainWindow {
+@Deprecated
+public class NewMainWindow extends BaseFrame implements IMainWindow {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -42,8 +42,7 @@ public class MainWindow extends JFrame implements IMainWindow {
     static {
         if (RuntimeUtil.isNix()) {
             nativeStreams = new NativeStreams("stdout.log", "stderr.log");
-        }
-        else {
+        } else {
             nativeStreams = null;
         }
     }
@@ -64,33 +63,18 @@ public class MainWindow extends JFrame implements IMainWindow {
 
     private MenuBar menuBar;
 
-    public MainWindow(String title) {
+    public NewMainWindow(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Application.INSTANCE.subscribe(this);
         setLocation(100, 100);
         setSize(600, 400);
-        SwingUtil.layoutAtScreenCenter(this);
         setupContentPane();
         setupMenuBar();
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setVisible(true);
 
         addActions();
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
-                Application.INSTANCE.post(MainWindowEvent.RESIZED);
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                super.componentMoved(e);
-                Application.INSTANCE.post(MainWindowEvent.MOVED);
-            }
-        });
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -121,47 +105,27 @@ public class MainWindow extends JFrame implements IMainWindow {
     private void setupContentPane() {
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
-        setContentPane(contentPane);
 
         addUpPanel(contentPane);
         addBottomPane(contentPane);
+
+        setContentPane(contentPane);
     }
 
     private void addUpPanel(JPanel contentPane) {
-        videoContentPane = VideoContentPanePresenter.INSTANCE.createVideoContentPane(this);
-        contentPane.add(videoContentPane.getComponent(), BorderLayout.CENTER);
+        JPanel upPanel = new JPanel();
+        contentPane.add(upPanel, BorderLayout.CENTER);
+        upPanel.setLayout(new BorderLayout());
 
-//        contentPane.setTransferHandler(new MediaTransferHandler() {
-//            @Override
-//            protected void onMediaDropped(String[] uris) {
-//                mediaPlayerComponent.getMediaPlayer().playMedia(uris[0]);
-//            }
-//        });
+        videoContentPane = VideoContentPanePresenter.INSTANCE.createVideoContentPane(this);
+        upPanel.add(videoContentPane.getComponent(), BorderLayout.CENTER);
     }
 
-//    private void addBottomPane(JPanel contentPane) {
-//        bottomPane = new JPanel();
-//        bottomPane.setLayout(new OverlayLayout(bottomPane));
-//
-//        danMuPanel = new DanMuPanel(600, 200);
-//        danMuPanel.getComponent().setAlignmentX(0);
-//        danMuPanel.getComponent().setAlignmentY(0);
-//        danMuPanel.getComponent().setBackground(Color.yellow);
-//        bottomPane.add(danMuPanel.getComponent());
-//
-//        JPanel bottomControlsPane = new JPanel();
-//        bottomControlsPane.setLayout(new MigLayout("fill, insets 0 n n n", "[grow]", "[]0[]"));
-//        bottomControlsPane.add(new ControlsPane(videoContentPane), "grow, wrap");
-//        bottomControlsPane.setAlignmentX(0);
-//        bottomControlsPane.setAlignmentY(0);
-//        bottomPane.add(bottomControlsPane);
-//        bottomControlsPane.setBackground(Color.blue);
-//
-//        contentPane.add(bottomPane, BorderLayout.SOUTH);
-//    }
+
 
     private void addBottomPane(JPanel contentPane) {
         bottomPane = new JPanel();
+        contentPane.add(bottomPane, BorderLayout.SOUTH);
         bottomPane.setLayout(new BorderLayout());
 
         JPanel bottomControlsPane = new JPanel();
@@ -172,7 +136,7 @@ public class MainWindow extends JFrame implements IMainWindow {
 //        statusBar = new StatusBar();
 //        bottomPane.add(statusBar, BorderLayout.SOUTH);
 
-        contentPane.add(bottomPane, BorderLayout.SOUTH);
+
     }
 
     @Override
@@ -221,6 +185,11 @@ public class MainWindow extends JFrame implements IMainWindow {
     }
 
     @Override
+    public Component getVideoContentPane() {
+        return videoContentPane.getComponent();
+    }
+
+    @Override
     public Component getComponent() {
         return this;
     }
@@ -228,10 +197,5 @@ public class MainWindow extends JFrame implements IMainWindow {
     @Override
     public JFrame getWindow() {
         return this;
-    }
-
-    @Override
-    public Component getVideoContentPane() {
-        return videoContentPane.getComponent();
     }
 }
